@@ -28,9 +28,9 @@ jobs:
           # path: ${{ inputs.path }}
           fetch-depth: 0
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v34
+      # - name: Get changed files
+      #   id: changed-files
+      #   uses: tj-actions/changed-files@v34
 
 
       - name: List all changed files
@@ -39,19 +39,19 @@ jobs:
             echo "$file was changed"
           done
       
-      # - name: Check for new commits today
-      #   id: check-new-commits
-      #   uses: adriangl/check-new-commits-action@v1
-      #   with:
-      #     token: ${{ secrets.pat_token }}
-      #     seconds: 86400 # One day in seconds
-      #     branch: ${{ inputs.branch }}
-      #     # working-directory: ${{ inputs.path }}
+      - name: Check for new commits today
+        id: check-new-commits
+        uses: adriangl/check-new-commits-action@v1
+        with:
+          token: ${{ secrets.pat_token }}
+          seconds: 86400 # One day in seconds
+          branch: ${{ inputs.branch }}
+          # working-directory: ${{ inputs.path }}
       
-      # - name: Print something if new commits are found
-      #   if: ${{ steps.check-new-commits.outputs.has-new-commits == 'true' }}
-      #   run: echo "You have ${{ steps.check-new-commits.outputs.new-commits-number }} new commit(s) ✅!"
+      - name: Print something if new commits are found
+        if: ${{ steps.check-new-commits.outputs.has-new-commits == 'true' }}
+        run: echo "You have ${{ steps.check-new-commits.outputs.new-commits-number }} new commit(s) ✅!"
       
-      # - name: Print another thing if new commits couldn't be found
-      #   if: ${{ steps.check-new-commits.outputs.has-new-commits != 'true' }}
-      #   run: echo "You don't have new commits 🛑!"
+      - name: Print another thing if new commits couldn't be found
+        if: ${{ steps.check-new-commits.outputs.has-new-commits != 'true' }}
+        run: echo "You don't have new commits 🛑!"
