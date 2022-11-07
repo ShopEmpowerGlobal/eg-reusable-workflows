@@ -1,0 +1,123 @@
+name: Build and Deploy EG-SFCC-BE Image to Google Cloud Platform
+
+on:
+  workflow_call:
+    inputs:
+      # pass in environment through manual trigger, if not passed in, default to 'Sandbox'
+      environment:
+        required: false
+        type: string
+        default: 'Sandbox'
+      image-name:
+        required: false
+        type: string
+        default: 'eg-sfcc-be'
+      project-id:
+        required: true
+        type: string
+        default: 'sandbox-363316'
+      artifact-registry:
+        required: true
+        type: string
+        default: ''
+    secrets:
+      service_account_key:
+        required: true
+      pat_token:
+        required: true
+
+jobs:
+  CheckoutRepo:
+    name: Build and Push to GCP
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ${{ inputs.image-name }}
+      PROJECT_ID: ${{ inputs.project-id }}
+      ARTIFACT_REGISTRY: ${{ inputs.artifact-registry }}
+
+    # important to specify the environment here so workflow knows where to deploy your artifact to.
+    # default environment to "Sandbox" if it is not passed in through workflow_dispatch manual trigger
+    environment:
+      name:  ${{ inputs.environment || 'Sandbox' }}
+    
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: ShopEmpowerGlobal/eg_SFCC_BE
+          ref: main
+          token: ${{ secrets.pat_token }}
+          path: eg_SFCC_BE
+
+      - name: 'Copy .github in eg_SFCC_BE'
+        run: |
+          cp -R .github/ eg_SFCC_BE/
+
+      - name: 'Authenticate to Google Cloud'
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{secrets.service_account_key}}
+        
+        
+      - name: 'Storing SA Key to json file'
+        id: sa-config
+        run: |
+          echo ${{secrets.service_account_key}} | base64 -d > .github/workflows/credentials.json
+        shell: bash
+        working-directory: eg_SFCC_BE/
+
+      - name: Build Docker Image
+        run: docker build -t $IMAGE_NAME:latest .
+        working-directory: eg_SFCC_BE/
+
+      - name: Automatic Tagging of Releases
+        id: increment-git-tag
+        run: |
+          bash .github/scripts/git_update.sh -v major
+        working-directory: eg_SFCC_BE/
+
+      - name: Configure Docker Client
+        run: |-
+          gcloud auth configure-docker --quiet
+          gcloud auth configure-docker $REGISTRY --quiet
+        working-directory: eg_SFCC_BE/  
+
+      - name: Push Docker Image to Container Registry (GCR) tag:latest
+        run: |-
+          docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
+          docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
+        working-directory: eg_SFCC_BE/
+
+      - name: Push Docker Image to Container Registry (GCR) tag:$GIT_TAG
+        env:
+          GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+        run: |-
+          docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
+          docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
+        working-directory: eg_SFCC_BE/
+
+        #TODO: Push Docker Image to Artifact Registry
+
+      # - name: Push Docker Image to Artifact Registry tag:latest
+      #   run: |-
+      #     docker tag $IMAGE_NAME:latest $ARTIFACT_REGISTRY/$PROJECT_ID/images/$IMAGE_NAME:latest
+      #     docker push $ARTIFACT_REGISTRY/$PROJECT_ID/images/$IMAGE_NAME:latest
+      #   working-directory: eg_SFCC_BE/
+
+      # - name: Push Docker Image to Artifact Registry tag:$GIT_TAG
+      #   env:
+      #     GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+      #   run: |-
+      #     docker tag $IMAGE_NAME:latest $ARTIFACT_REGISTRY/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
+      #     docker push $ARTIFACT_REGISTRY/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
+      #   working-directory: eg_SFCC_BE/
+
+

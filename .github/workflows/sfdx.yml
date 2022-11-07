@@ -1,0 +1,48 @@
+name: SFDX Build Test and Deploy
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        required: true
+        type: string
+      path:
+        required: true
+        type: string
+      username:
+        required: true
+        type: string
+    secrets:
+      auth_url:
+        required: true
+      pat_token:
+        required: true
+
+jobs:
+  
+  SFDXCli:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Checkout eg_SFDC_core
+        uses: actions/checkout@v3
+        with:
+          repository: ShopEmpowerGlobal/eg_SFDC_core
+          ref: ${{ inputs.branch }}
+          token: ${{ secrets.pat_token }}
+          path: ${{ inputs.path }}
+      
+      # Install Salesforce CLI
+      - name: Install Salesforce CLI
+        run: npm install sfdx-cli -g
+
+      - name: Auth
+        uses: sfdx-actions/setup-sfdx@v1
+        with:
+           sfdx-auth-url: ${{ secrets.auth_url }}
+      
+      - name: Test&Deploy
+        run: sfdx force:source:deploy --sourcepath force-app -l RunLocalTests --targetusername ${{ inputs.username }}
+        working-directory: ${{ inputs.path }}

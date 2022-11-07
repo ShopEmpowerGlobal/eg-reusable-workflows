@@ -1,0 +1,74 @@
+name: SFCC Build Test and Deploy
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        required: true
+        type: string
+      path:
+        required: true
+        type: string
+      hostname:
+        required: true
+        type: string
+      username:
+        required: true
+        type: string
+    secrets:
+      pat_token:
+        required: true
+      sfcc_pass:
+        required: true
+
+jobs:
+  
+  Build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.21.0]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Checkout eg_sfcc
+        uses: actions/checkout@v3
+        with:
+          repository: ShopEmpowerGlobal/eg_sfcc
+          ref: ${{ inputs.branch }}
+          token: ${{ secrets.pat_token }}
+          path: ${{ inputs.path }}
+
+      - name: Checkout
+        uses: CareMessagePlatform/check-if-merged@v2
+
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ${{ inputs.path }}
+
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo HOSTNAME=${{ inputs.hostname }} >> .env
+          echo USERNAME=${{ inputs.username }} >> .env
+          echo VERSION=$(date +"%Y-%m-%d-%T") >> .env
+          echo PASSWORD='${{ secrets.sfcc_pass }}' >> .env
+          cat .env
+        working-directory: ${{ inputs.path }}
+
+      - name: Build
+        run: npm run build
+        working-directory: ${{ inputs.path }}
+
+      - name: Deploy
+        run: npm run deploy
+        working-directory: ${{ inputs.path }}

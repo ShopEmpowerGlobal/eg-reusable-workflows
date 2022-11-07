@@ -1,0 +1,33 @@
+name: EG-SFCC-BE
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    types: [closed]  # when PR is merged, CD will be triggered
+
+jobs:
+
+  # DeploytoDev:
+  #   permissions:
+  #     id-token: write # need this for OIDC
+  #     contents: read
+  #   uses: ShopEmpowerGlobal/eg_SFCC_BE/.github/workflows/build_tag_docker_deploy.yml.yml@main
+  #   with:
+  #     project-id: ''
+  #   secrets:
+  #     workload_identity_provider: ${{ secrets.SANDBOX_WORKLOAD_IDENTITY_PROVIDER }}
+
+  DeploytoSandbox:
+    permissions:
+      id-token: write # need this for OIDC
+      contents: read
+    uses: ShopEmpowerGlobal/eg_workflows/.github/workflows/build_tag_docker_deploy.yml@main
+    with:
+      project-id: 'sandbox-363316'
+      artifact-registry: 'us-east1-docker.pkg.dev'
+    secrets:
+      service_account_key: ${{ secrets.SANDBOX_SERVICE_ACCOUNT_KEY }}
+      pat_token: ${{ secrets.PAT_TOKEN }}

@@ -1,0 +1,160 @@
+name: Npm Build Test and Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: false
+        type: string
+        default: 'Sandbox'
+      storage_bucket:
+        required: true
+        type: string
+        default: 'tf-eg-web-static'
+      react_base_url:
+        required: true
+        type: string
+      react_app_sfra_host:
+        required: true
+        type: string
+      react_app_organization_id:
+        required: true
+        type: string
+      react_app_site_id:
+        required: true
+        type: string
+      react_app_redirect_uri:
+        required: true
+        type: string
+      react_app_gtm_id:
+        required: true
+        type: string
+    secrets:
+      submodule_pull_key:
+        required: true
+      service_account_key:
+        required: true
+      pat_token:
+        required: true
+      react_app_public_client_id:
+        required: true
+      react_app_stripe_publishable_key:
+        required: true
+      react_app_userback_access_token:
+        required: true
+      react_app_recaptcha_site_key:
+        required: true
+
+jobs:
+  # build-and-run-tests:
+  #   name: 'Build and Run Test'
+  #   # The type of runner that the job will run on
+  #   runs-on: ubuntu-latest
+
+  #   # important to specify the environment here so workflow knows where to deploy your artifact to.
+  #   # default environment to "Sandbox" if it is not passed in through workflow_dispatch manual trigger
+  #   environment:
+  #     name: ${{ inputs.environment || 'Sandbox' }}
+
+  #   strategy:
+  #     matrix:
+  #       node-version: [16.15.1]
+
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+
+  #     - name: Checkout eg_SFCC_FE
+  #       uses: actions/checkout@v3
+  #       with:
+  #         ssh-key: ${{secrets.submodule_pull_key}}
+  #         submodules: recursive
+  #         repository: ShopEmpowerGlobal/eg_SFCC_FE
+  #         token: ${{ secrets.pat_token }}
+  #         path: eg_SFCC_FE
+
+  #     - name: Set up Node.js ${{ matrix.node-version }}
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+
+  #     - name: Install dependencies
+  #       run: npm install
+  #       working-directory: eg_SFCC_FE/
+
+      # - name: Run the tests and generate coverage report
+      #   run: npm test
+
+  build-and-upload-to-storage-bucket:
+    # needs: build-and-run-tests
+    name: 'Deploy to Storage Bucket'
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # important to specify the environment here so workflow knows where to deploy your artifact to.
+    # default environment to "Sandbox" if it is not passed in through workflow_dispatch manual trigger
+    environment:
+      name: ${{ inputs.environment || 'Sandbox' }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    strategy:
+      matrix:
+        node-version: [16.15.1]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout eg_SFCC_FE
+        uses: actions/checkout@v3
+        with:
+          ssh-key: ${{secrets.submodule_pull_key}}
+          submodules: recursive
+          repository: ShopEmpowerGlobal/eg_SFCC_FE
+          token: ${{ secrets.pat_token }}
+          path: eg_SFCC_FE
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: eg_SFCC_FE/
+
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo REACT_APP_BASE_URL=${{ inputs.react_base_url }} >> .env
+          echo REACT_APP_SFRA_HOST=${{ inputs.react_app_sfra_host }} >> .env
+          echo REACT_APP_ORGANIZATION_ID=${{ inputs.react_app_organization_id }} >> .env
+          echo REACT_APP_PUBLIC_CLIENT_ID='${{ secrets.react_app_public_client_id }}' >> .env
+          echo REACT_APP_SITE_ID=${{ inputs.react_app_site_id }} >> .env
+          echo REACT_APP_REDIRECT_URI=${{ inputs.react_app_redirect_uri }} >> .env
+          echo REACT_APP_STRIPE_PUBLISHABLE_KEY='${{ secrets.react_app_stripe_publishable_key }}' >> .env
+          echo REACT_APP_USERBACK_ACCESS_TOKEN='${{ secrets.react_app_userback_access_token }}' >> .env
+          echo REACT_APP_GTM_ID=${{ inputs.react_app_gtm_id }} >> .env
+          echo REACT_APP_RECAPTCHA_SITE_KEY='${{ secrets.react_app_recaptcha_site_key }}' >> .env
+          cat .env
+        working-directory: eg_SFCC_FE/
+
+      - name: Build
+        run: npm run build
+        working-directory: eg_SFCC_FE/
+
+      - name: 'Authenticate to Google Cloud'
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.service_account_key }}
+
+      - name: Upload to Bucket
+        id: 'upload-file-bkt'
+        uses: 'google-github-actions/upload-cloud-storage@v0'
+        with:
+          path: 'eg_SFCC_FE/build'
+          destination: ${{ inputs.storage_bucket }}
+          parent: false
+        

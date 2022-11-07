@@ -1,0 +1,38 @@
+name: EG-SFCC-FE
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    types: [closed] # when PR is merged, CD will be triggered
+
+jobs:
+  
+  DeploytoSandbox:
+    permissions:
+      id-token: write # need this for OIDC
+      contents: read
+    uses: ShopEmpowerGlobal/eg_workflows/.github/workflows/npm_build_deploy.yml@main
+    with:
+      environment: 'Sandbox'
+      storage_bucket: 'tf-eg-web-static'
+      react_base_url: 'https://egtst.com/sf'
+      react_app_sfra_host: 'https://egtst.com'
+      react_app_organization_id: 'f_ecom_bfdz_stg'
+      react_app_site_id: 'EmpowerGlobal'
+      react_app_redirect_uri: 'https://egtst.com/api/sf-accept-redirect'
+      react_app_gtm_id: 'GTM-TJDJQ75'
+    secrets:
+      submodule_pull_key: ${{secrets.SUBMODULE_PULL_KEY}}
+      service_account_key: ${{ secrets.SANDBOX_SERVICE_ACCOUNT_KEY }}
+      pat_token: ${{ secrets.PAT_TOKEN }}
+      react_app_public_client_id: ${{secrets.REACT_APP_PUBLIC_CLIENT_ID}}
+      react_app_stripe_publishable_key: ${{secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY}}
+      react_app_userback_access_token: ${{secrets.REACT_APP_USERBACK_ACCESS_TOKEN}}
+      react_app_recaptcha_site_key: ${{secrets.REACT_APP_RECAPTCHA_SITE_KEY}}
+
+
+
+      

@@ -1,0 +1,241 @@
+name: Clone TS Repo Every 24hrs
+
+on:
+  workflow_dispatch:
+  schedule:
+  # - cron: "* * * * *"
+  - cron: "0 0 * * *"
+
+jobs:
+
+  eg_SFCC_FE:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_SFCC_FE
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_SFCC_FE'
+          submodules: 'recursive'
+          
+      - name: MirrorRepo
+        run: |
+          cd eg_SFCC_FE
+          git fetch --unshallow https://github.com/TechSparq/eg_SFCC_FE.git
+          git push --mirror https://github.com/ShopEmpowerGlobal/eg_SFCC_FE.git
+
+  eg_sfcc_Main:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_sfcc
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_sfcc'
+          
+      - name: MirrorRepo
+        run: |
+          cd eg_sfcc
+          git pull
+          git remote add new-origin https://github.com/ShopEmpowerGlobal/eg_sfcc.git
+          git remote -v
+          git push new-origin
+
+  eg_sfcc_Dev:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_sfcc
+          ref: develop
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_sfcc'
+          
+      - name: MirrorRepo
+        run: |
+          cd eg_sfcc
+          git pull
+          git fetch --unshallow
+          git remote add new-origin https://github.com/ShopEmpowerGlobal/eg_sfcc.git
+          git remote -v
+          git push new-origin develop
+
+  eg_SFCC_FE_core:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_SFCC_FE_core
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_SFCC_FE_core'
+          
+      - name: MirrorRepo
+        run: |
+          cd eg_SFCC_FE_core
+          git fetch --unshallow https://github.com/TechSparq/eg_SFCC_FE_core.git
+          git push --mirror https://github.com/ShopEmpowerGlobal/eg_SFCC_FE_core.git
+
+  eg_SFCC_BE:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_SFCC_BE
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_SFCC_BE'
+          lfs: true
+          
+      - name: MirrorRepo
+        run: |
+          cd eg_SFCC_BE
+          git fetch --unshallow https://github.com/TechSparq/eg_SFCC_BE.git
+          git push --mirror https://github.com/ShopEmpowerGlobal/eg_SFCC_BE.git
+
+  eg_SFDC_core_Main:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_SFDC_core
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_SFDC_core'
+          lfs: true
+
+      - name: MirrorRepo
+        run: |
+          cd eg_SFDC_core
+          git pull
+          git remote add new-origin https://github.com/ShopEmpowerGlobal/eg_SFDC_core.git
+          git remote -v
+          git push new-origin
+
+  eg_SFDC_core_Dev:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_SFDC_core
+          ref: develop
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_SFDC_core'
+          lfs: true
+
+      - name: MirrorRepo
+        run: |
+          cd eg_SFDC_core
+          git pull
+          git fetch --unshallow
+          git remote add new-origin https://github.com/ShopEmpowerGlobal/eg_SFDC_core.git
+          git remote -v
+          git push new-origin develop
+  eg_SFDC_core_Stg:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_SFDC_core
+          ref: staging
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_SFDC_core'
+          lfs: true
+
+      - name: MirrorRepo
+        run: |
+          cd eg_SFDC_core
+          git pull
+          git fetch --unshallow
+          git remote add new-origin https://github.com/ShopEmpowerGlobal/eg_SFDC_core.git
+          git remote -v
+          git push new-origin staging
+
+
+  eg_SFCC_BE_ADMIN:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_SFCC_BE_ADMIN
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_SFCC_BE_ADMIN'
+          
+      - name: MirrorRepo
+        run: |
+          cd eg_SFCC_BE_ADMIN
+          git fetch --unshallow https://github.com/TechSparq/eg_SFCC_BE_ADMIN.git
+          git push --mirror https://github.com/ShopEmpowerGlobal/eg_SFCC_BE_ADMIN.git
+
+
+  eg_Services_Postman:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_Services_Postman
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_Services_Postman'
+          lfs: true
+          
+      - name: MirrorRepo
+        run: |
+          cd eg_Services_Postman
+          git fetch --unshallow https://github.com/TechSparq/eg_Services_Postman.git
+          git push --mirror https://github.com/ShopEmpowerGlobal/eg_Services_Postman.git
+
+  eg_terraform:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_terraform
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_terraform'
+
+      - name: MirrorRepo
+        run: |
+          cd eg_terraform
+          git fetch --unshallow https://github.com/TechSparq/eg_terraform.git
+          git push --mirror https://github.com/ShopEmpowerGlobal/eg_terraform.git
+
+  eg_terraform_gke:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: TechSparq/eg_terraform_gke
+          token: ${{ secrets.PAT_TOKEN }}
+          path: 'eg_terraform_gke'
+          lfs: true
+          
+      - name: MirrorRepo
+        run: |
+          cd eg_terraform_gke
+          git fetch --unshallow https://github.com/TechSparq/eg_terraform_gke.git
+          git push --mirror https://github.com/ShopEmpowerGlobal/eg_terraform_gke.git
+        
+
