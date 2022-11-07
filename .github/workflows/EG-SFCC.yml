@@ -14,13 +14,12 @@ on:
 
 jobs:
 
-  CheckDev:
+  CheckChangesDev:
     permissions:
       id-token: write # need this for OIDC
       contents: read
     uses: ShopEmpowerGlobal/eg_workflows/.github/workflows/check_changes.yml@main
     with:
-      # path: 'eg_sfcc'
       branch: 'develop'
     secrets:
       pat_token: ${{ secrets.PAT_TOKEN }}
