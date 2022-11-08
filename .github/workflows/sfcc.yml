@@ -59,6 +59,8 @@ jobs:
         working-directory: ${{ inputs.path }}
 
       - name: 'Create env file'
+        env:
+          GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
         run: |
           touch .env
           echo HOSTNAME=${{ inputs.hostname }} >> .env
