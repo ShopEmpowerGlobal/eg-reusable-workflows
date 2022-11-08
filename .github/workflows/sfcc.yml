@@ -15,6 +15,9 @@ on:
       client_id:
         required: true
         type: string
+      activate_code_version:
+        required: true
+        type: string
     secrets:
       pat_token:
         required: true
@@ -67,7 +70,7 @@ jobs:
           echo CLIENT_ID=${{ inputs.client_id }} >> .env
           echo VERSION=$BUILD_NUMBER >> .env
           echo CLIENT_SECRET='${{ secrets.client_secret }}' >> .env
-          echo ACTIVATE_CODE_VERSION='false' >> .env
+          echo ACTIVATE_CODE_VERSION=${{ inputs.activate_code_version }} >> .env
           echo 
           cat .env
         working-directory: ${{ inputs.path }}
@@ -76,6 +79,6 @@ jobs:
         run: npm run build
         working-directory: ${{ inputs.path }}
 
-      - name: Deploy
-        run: npm run deploy
-        working-directory: ${{ inputs.path }}
+      # - name: Deploy
+      #   run: npm run deploy
+      #   working-directory: ${{ inputs.path }}
