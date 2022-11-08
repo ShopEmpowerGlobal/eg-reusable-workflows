@@ -48,9 +48,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # - name: Install Dependencies
-      #   run: npm install
-      #   working-directory: ${{ inputs.path }}
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ${{ inputs.path }}
 
       - name: Automatic Tagging of Releases
         id: increment-git-tag
@@ -58,24 +58,24 @@ jobs:
           bash .github/workflows/scripts/version.sh -v major
         working-directory: ${{ inputs.path }}
 
-      # - name: 'Create env file'
-      #   env:
-      #     GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
-      #   run: |
-      #     touch .env
-      #     echo HOSTNAME=${{ inputs.hostname }} >> .env
-      #     echo CLIENT_ID=${{ inputs.client_id }} >> .env
-      #     echo VERSION=$GIT_TAG >> .env
-      #     echo CLIENT_SECRET='${{ secrets.client_secret }}' >> .env
-      #     echo ACTIVATE_CODE_VERSION=${{ inputs.activate_code_version }} >> .env
-      #     echo 
-      #     cat .env
-      #   working-directory: ${{ inputs.path }}
+      - name: 'Create env file'
+        env:
+          GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+        run: |
+          touch .env
+          echo HOSTNAME=${{ inputs.hostname }} >> .env
+          echo CLIENT_ID=${{ inputs.client_id }} >> .env
+          echo VERSION=$GIT_TAG >> .env
+          echo CLIENT_SECRET='${{ secrets.client_secret }}' >> .env
+          echo ACTIVATE_CODE_VERSION=${{ inputs.activate_code_version }} >> .env
+          echo 
+          cat .env
+        working-directory: ${{ inputs.path }}
 
-      # - name: Build
-      #   run: npm run build
-      #   working-directory: ${{ inputs.path }}
+      - name: Build
+        run: npm run build
+        working-directory: ${{ inputs.path }}
 
-      # - name: Deploy
-      #   run: npm run deploy
-      #   working-directory: ${{ inputs.path }}
+      - name: Deploy
+        run: npm run deploy
+        working-directory: ${{ inputs.path }}
