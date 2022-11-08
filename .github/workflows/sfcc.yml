@@ -38,7 +38,7 @@ jobs:
           token: ${{secrets.github_token}}    
 
       - name: Print new build number
-        run: echo "Build:"" $BUILD_NUMBER"
+        run: echo "Build Number:$BUILD_NUMBER"
 
       # - name: Checkout
       #   uses: actions/checkout@v3
