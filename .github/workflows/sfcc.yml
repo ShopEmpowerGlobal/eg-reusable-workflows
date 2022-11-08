@@ -48,7 +48,7 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.pat_token }}
-          append_to_pre_release_tag: "sfcc"
+          append_to_pre_release_tag: "sfcc_dev"
 
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
