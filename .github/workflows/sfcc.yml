@@ -50,7 +50,6 @@ jobs:
           github_token: ${{ secrets.pat_token }}
           default_bump: false
           default_prerelease_bump: false
-          create_annotated_tag: true
           append_to_pre_release_tag: "helloworld"
 
       - name: Create a GitHub release
