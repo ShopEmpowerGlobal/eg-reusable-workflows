@@ -35,17 +35,6 @@ jobs:
 
     steps:
 
-      - name: Generate build number
-        uses: einaregilsson/build-number@v3
-        with:
-          token: ${{secrets.pat_token}}    
-
-      - name: Print new build number
-        run: echo "Build number is $BUILD_NUMBER"
-
-      # - name: Checkout
-      #   uses: actions/checkout@v3
-
       - name: Checkout eg_sfcc
         uses: actions/checkout@v3
         with:
@@ -63,12 +52,17 @@ jobs:
         run: npm install
         working-directory: ${{ inputs.path }}
 
+      - name: Automatic Tagging of Releases
+        id: increment-git-tag
+        run: |
+          bash .github/scripts/version.sh -v major
+
       - name: 'Create env file'
         run: |
           touch .env
           echo HOSTNAME=${{ inputs.hostname }} >> .env
           echo CLIENT_ID=${{ inputs.client_id }} >> .env
-          echo VERSION=$BUILD_NUMBER >> .env
+          echo VERSION=$GIT_TAG >> .env
           echo CLIENT_SECRET='${{ secrets.client_secret }}' >> .env
           echo ACTIVATE_CODE_VERSION=${{ inputs.activate_code_version }} >> .env
           echo 
