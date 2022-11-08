@@ -53,13 +53,20 @@ jobs:
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.tag_version.outputs.new_tag }} >> $GITHUB_OUTPUT
+          tag: ${{ steps.tag_version.outputs.new_tag }}
           name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
           token: ${{ secrets.pat_token }}
 
       - name: 'Check env file'
-        run: echo $NEWTAG
+        run: |
+           touch .env
+           echo VERSION=${{ steps.tag_version.outputs.new_tag }} >> .env
+           echo
+           cat .env
+        working-directory: ${{ inputs.path }}
+
+
 
       # - name: Set up Node.js ${{ matrix.node-version }}
       #   uses: actions/setup-node@v3
