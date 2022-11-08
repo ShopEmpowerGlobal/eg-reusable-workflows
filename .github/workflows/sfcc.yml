@@ -55,7 +55,8 @@ jobs:
       - name: Automatic Tagging of Releases
         id: increment-git-tag
         run: |
-          bash .github/scripts/version.sh -v major
+          bash .github/workflows/scripts/version.sh -v major
+        working-directory: ${{ inputs.path }}
 
       - name: 'Create env file'
         run: |
