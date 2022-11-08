@@ -48,7 +48,6 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.pat_token }}
-          custom_tag: "test"
           default_bump: false
           default_prerelease_bump: false
           create_annotated_tag: true
