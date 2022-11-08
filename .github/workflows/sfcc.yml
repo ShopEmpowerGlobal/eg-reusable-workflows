@@ -35,6 +35,18 @@ jobs:
 
     steps:
 
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.pat_token }}
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+
       - name: Checkout eg_sfcc
         uses: actions/checkout@v3
         with:
@@ -42,6 +54,18 @@ jobs:
           ref: ${{ inputs.branch }}
           token: ${{ secrets.pat_token }}
           path: ${{ inputs.path }}
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.pat_token }}
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
 
       # - name: Set up Node.js ${{ matrix.node-version }}
       #   uses: actions/setup-node@v3
@@ -52,14 +76,8 @@ jobs:
       #   run: npm install
       #   working-directory: ${{ inputs.path }}
 
-      - name: Automatic Tagging of Releases
-        id: increment-git-tag
-        run: |
-          bash .github/workflows/scripts/version.sh --major
-        working-directory: ${{ inputs.path }}
-
-      - name: 'Check env file'
-        run: echo $NEWTAG
+      # - name: 'Check env file'
+      #   run: echo $NEWTAG
 
       # - name: 'Create env file'
       #   env:
