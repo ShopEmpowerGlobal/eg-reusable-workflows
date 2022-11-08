@@ -12,13 +12,13 @@ on:
       hostname:
         required: true
         type: string
-      username:
+      client_id:
         required: true
         type: string
     secrets:
       pat_token:
         required: true
-      sfcc_pass:
+      client_secret:
         required: true
 
 jobs:
@@ -31,6 +31,15 @@ jobs:
         node-version: [12.21.0]
 
     steps:
+
+      - name: Generate build number
+        uses: einaregilsson/build-number@v3
+        with:
+          token: ${{secrets.github_token}}    
+
+      - name: Print new build number
+        run: echo "Build:"" $BUILD_NUMBER"
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -41,10 +50,6 @@ jobs:
           ref: ${{ inputs.branch }}
           token: ${{ secrets.pat_token }}
           path: ${{ inputs.path }}
-
-      - name: Checkout
-        uses: CareMessagePlatform/check-if-merged@v2
-
 
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
@@ -59,9 +64,11 @@ jobs:
         run: |
           touch .env
           echo HOSTNAME=${{ inputs.hostname }} >> .env
-          echo USERNAME=${{ inputs.username }} >> .env
-          echo VERSION=$(date +"%Y-%m-%d-%T") >> .env
-          echo PASSWORD='${{ secrets.sfcc_pass }}' >> .env
+          echo CLIENT_ID=${{ inputs.client_id }} >> .env
+          echo VERSION=${{ BUILD_NUMBER }} >> .env
+          echo CLIENT_SECRET='${{ secrets.client_secret }}' >> .env
+          echo ACTIVATE_CODE_VERSION='true' >> .env
+          echo 
           cat .env
         working-directory: ${{ inputs.path }}
 
