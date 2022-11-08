@@ -48,15 +48,18 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.pat_token }}
-          append_to_pre_release_tag: "helloworld"
+          append_to_pre_release_tag: "sfcc"
 
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
+          tag: ${{ steps.tag_version.outputs.new_tag }} >> $GITHUB_OUTPUT
           name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
           token: ${{ secrets.pat_token }}
+
+      - name: 'Check env file'
+        run: echo $NEWTAG
 
       # - name: Set up Node.js ${{ matrix.node-version }}
       #   uses: actions/setup-node@v3
@@ -66,9 +69,6 @@ jobs:
       # - name: Install Dependencies
       #   run: npm install
       #   working-directory: ${{ inputs.path }}
-
-      # - name: 'Check env file'
-      #   run: echo $NEWTAG
 
       # - name: 'Create env file'
       #   env:
