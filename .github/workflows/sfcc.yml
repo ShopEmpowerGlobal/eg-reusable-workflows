@@ -63,7 +63,7 @@ jobs:
           touch .env
           echo HOSTNAME=${{ inputs.hostname }} >> .env
           echo CLIENT_ID=${{ inputs.client_id }} >> .env
-          echo VERSION=$GIT_TAG >> .env
+          echo VERSION=$NEW_TAG >> .env
           echo CLIENT_SECRET='${{ secrets.client_secret }}' >> .env
           echo ACTIVATE_CODE_VERSION=${{ inputs.activate_code_version }} >> .env
           echo 
