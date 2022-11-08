@@ -65,9 +65,9 @@ jobs:
           touch .env
           echo HOSTNAME=${{ inputs.hostname }} >> .env
           echo CLIENT_ID=${{ inputs.client_id }} >> .env
-          
+          echo VERSION=$BUILD_NUMBER >> .env
           echo CLIENT_SECRET='${{ secrets.client_secret }}' >> .env
-          echo ACTIVATE_CODE_VERSION='true' >> .env
+          echo ACTIVATE_CODE_VERSION='false' >> .env
           echo 
           cat .env
         working-directory: ${{ inputs.path }}
