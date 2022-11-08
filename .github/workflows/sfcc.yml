@@ -52,7 +52,6 @@ jobs:
           default_prerelease_bump: false
           create_annotated_tag: true
           append_to_pre_release_tag: "helloworld"
-          dry_run: true
 
       # - name: Create a GitHub release
       #   uses: ncipollo/release-action@v1
