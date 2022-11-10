@@ -6,9 +6,6 @@ on:
       branch:
         required: true
         type: string
-      # path:
-      #   required: true
-      #   type: string
     secrets:
       pat_token:
         required: true
@@ -25,39 +22,9 @@ jobs:
           repository: ShopEmpowerGlobal/eg_sfcc
           ref: ${{ inputs.branch }}
           token: ${{ secrets.pat_token }}
-          # path: ${{ inputs.path }}
           fetch-depth: 0
-
-      # - name: Get changed files
-      #   id: changed-files
-      #   uses: tj-actions/changed-files@v34
-
-
-      - name: List all changed files
-        run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo "$file was changed"
-          done
       
-      - name: Check for new commits today
-        id: check-new-commits
-        uses: adriangl/check-new-commits-action@v1
+      - name: Detect Branch Changes
+        uses: younited/detect-branch-changes-action@v0.1.3
         with:
-          token: ${{ secrets.pat_token }}
-          seconds: 86400 # One day in seconds
-          branch: ${{ inputs.branch }}
-      
-      - name: Print something if new commits are found
-        id: commit-found
-        if: ${{ steps.check-new-commits.outputs.has-new-commits == 'true' }}
-        run: echo "You have ${{ steps.check-new-commits.outputs.new-commits-number }} new commit(s) ✅!"
-
-
-      - name: Set True
-        if: ${{ steps.commit-found.output == 'true' }}
-        run: echo "You have ${{ steps.check-new-commits.outputs.new-commits-number }} new commit(s) ✅!"
-
-      
-      - name: Print another thing if new commits couldn't be found
-        if: ${{ steps.check-new-commits.outputs.has-new-commits != 'true' }}
-        run: echo "You don't have new commits 🛑!"
+          base_branch: ${{ inputs.branch }}
