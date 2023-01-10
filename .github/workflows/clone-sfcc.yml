@@ -1,0 +1,41 @@
+name: Clone eg_sfcc from TS
+
+on:
+  workflow_call:
+    inputs:
+      repository:
+        required: true
+        type: string
+      ref:
+        required: true
+        type: string
+      new-dev-origin:
+        required: true
+        type: string
+      path:
+        required: true
+        type: string
+    secrets:
+      pat_token:
+        required: true
+
+jobs:
+
+  eg_sfcc:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          repository: ${{ inputs.repository }}
+          token: ${{ secrets.PAT_TOKEN }}
+          
+      - name: PushToRemote
+        uses: yesolutions/mirror-action@master
+        with:
+          REMOTE: 'https://github.com/ShopEmpowerGlobal/eg_sfcc.git'
+          GIT_USERNAME: itopsadmin-eg
+          GIT_PASSWORD: ${{ secrets.GH_SA_PASS }}
+          DEBUG: TRUE
