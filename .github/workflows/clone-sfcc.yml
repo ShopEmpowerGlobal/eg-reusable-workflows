@@ -6,15 +6,6 @@ on:
       repository:
         required: true
         type: string
-      ref:
-        required: true
-        type: string
-      new-dev-origin:
-        required: true
-        type: string
-      path:
-        required: true
-        type: string
     secrets:
       pat_token:
         required: true
