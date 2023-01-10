@@ -37,6 +37,7 @@ Step 2: Make your actions accessible across your organization
 After you add a workflow_call trigger, you need to make sure that your repositories in your organization have access to it. To do this, go to your repository settings, select Actions, and enable access to repositories in your organization.
 
 ![Enabling access for GitHub Actions at the organization level](https://github.blog/wp-content/uploads/2022/02/enabling-access-github-actions-org-level.png?w=658)
+
 Enabling access for GitHub Actions at the organization level
 
 ## TL;DR
